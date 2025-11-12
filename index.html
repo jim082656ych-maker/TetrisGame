@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>俄羅斯方塊 (行動版)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>俄羅斯方塊</h1>
+    <h2>分數: <span id="score">0</span></h2>
+    
+    <canvas id="tetris-board"></canvas>
+
+    <div class="mobile-controls">
+        <button id="btn-left">←</button>
+        <button id="btn-rotate">↑</button>
+        <button id="btn-down">↓</button>
+        <button id="btn-right">→</button>
+    </div>
+    <button id="btn-pause">P (暫停)</button>
+
+    <div class="instructions">
+        <h3>遊戲控制</h3>
+        <p>← / ↑ / → / ↓: 移動與旋轉</p>
+        <p>P: 暫停 / 繼續</p>
+        <p>(在行動裝置上請使用畫面上的按鈕)</p>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

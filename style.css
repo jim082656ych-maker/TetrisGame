@@ -1,0 +1,90 @@
+/* 讓整個頁面置中 */
+body {
+    background-color: #2c3e50; /* 深藍灰色背景 */
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 20px;
+}
+
+/* 遊戲畫布的樣式 */
+#tetris-board {
+    background-color: #000; /* 畫布背景為黑色 */
+    border: 5px solid #7f8c8d; /* 加上灰色邊框 */
+}
+
+/* 分數的樣式 */
+#score {
+    color: #FFFF00; /* 黃色 */
+}
+
+/* 【!! 新增 !!】 行動裝置按鈕 */
+.mobile-controls {
+    display: flex; /* 使用 flexbox 布局 */
+    justify-content: center; /* 置中 */
+    width: 250px; /* 比畫布寬一點 */
+    margin: 15px auto 10px auto;
+}
+
+.mobile-controls button {
+    font-size: 24px;
+    font-weight: bold;
+    width: 60px; /* 增大點擊範圍 */
+    height: 60px;
+    margin: 0 5px;
+    border-radius: 10px;
+    background-color: #555;
+    color: white;
+    border: 2px solid #888;
+    
+    /* 【!! 新增 !!】 防止手機長按或雙擊時選取文字或觸發奇怪行為 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 暫停按鈕 */
+#btn-pause {
+    font-size: 16px;
+    width: 150px;
+    height: 40px;
+    margin-top: 5px;
+    background-color: #c0392b; /* 紅色 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 按下按鈕時的觸感 */
+.mobile-controls button:active,
+#btn-pause:active {
+    background-color: #777;
+}
+
+/* 【!! 新增 !!】 說明欄位的樣式 */
+.instructions {
+    margin-top: 20px;
+    padding: 10px;
+    border: 2px solid #7f8c8d;
+    border-radius: 5px;
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #34495e;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #7f8c8d;
+    padding-bottom: 5px;
+}
+
+.instructions p {
+    margin: 5px 0;
+    text-align: left;
+}
