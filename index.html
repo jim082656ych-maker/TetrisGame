@@ -2,31 +2,58 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>俄羅斯方塊 (行動版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <title>俄羅斯方塊 (單/雙人版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>俄羅斯方塊</h1>
-    <h2>分數: <span id="score">0</span></h2>
-    
-    <canvas id="tetris-board"></canvas>
 
-    <div class="mobile-controls">
-        <button id="btn-left">←</button>
-        <button id="btn-rotate">↑</button>
-        <button id="btn-down">↓</button>
-        <button id="btn-right">→</button>
+    <div id="main-menu" class="menu-container">
+        <h2>選擇模式</h2>
+        <button id="btn-single-player">單人遊戲 (P1)</button>
+        <button id="btn-two-player">雙人對戰 (P1 vs P2)</button>
     </div>
-    <button id="btn-pause">P (暫停)</button>
 
-    <div class="instructions">
-        <h3>遊戲控制</h3>
-        <p>← / ↑ / → / ↓: 移動與旋轉</p>
-        <p>P: 暫停 / 繼續</p>
-        <p>(在行動裝置上請使用畫面上的按鈕)</p>
-    </div>
-    
-    <script src="script.js"></script>
+    <div id="game-area" class="hidden">
+        <div class="game-container">
+            
+            <div class="player-zone" id="player1-zone">
+                <h2>玩家 1</h2>
+                <canvas id="p1-board"></canvas>
+                <h3>分數: <span id="p1-score">0</span></h3>
+            </div>
+
+            <div class="player-zone hidden" id="player2-zone">
+                <h2>玩家 2</h2>
+                <canvas id="p2-board"></canvas>
+                <h3>分數: <span id="p2-score">0</span></h3>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="btn-pause">P (暫停)</button>
+            <button id="btn-restart-match" class="hidden">重開本局</button> <button id="btn-restart">回主選單</button> 
+        </div>
+
+        <div class="instructions hidden" id="instructions-p1">
+            <h3>遊戲控制 (P1)</h3>
+            <p>↑ (上): 旋轉 | ← (左): 向左 | ↓ (下): 加速 | → (右): 向右 | P: 暫停</p>
+        </div>
+        
+        <div class="instructions hidden" id="instructions-p2">
+            <h3>遊戲控制</h3>
+            <div class="control-split">
+                <div class="player-controls">
+                    <strong>玩家 1 (方向鍵)</strong>
+                </div>
+                <div class="player-controls">
+                    <strong>玩家 2 (W/A/S/D)</strong>
+                </div>
+            </div>
+            <p><strong>P 鍵:</strong> 暫停 / 繼續</p>
+        </div>
+
+    </div> <script src="script.js"></script>
 </body>
 </html>
