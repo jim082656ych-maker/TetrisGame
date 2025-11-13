@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
-    <title>俄羅斯方塊 (單/雙人版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>俄羅斯方塊 (單/雙人/闖關)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,8 +11,14 @@
 
     <div id="main-menu" class="menu-container">
         <h2>選擇模式</h2>
-        <button id="btn-single-player">單人遊戲 (P1)</button>
+        <button id="btn-single-player">單人闖關 (目標: 100行)</button>
         <button id="btn-two-player">雙人對戰 (P1 vs P2)</button>
+    </div>
+
+    <div id="game-won" class="menu-container hidden">
+        <h2 id="congrats-text">CONGRATULATIONS</h2> 
+        <p id="win-message">你完成了 100 行挑戰！</p> 
+        <button id="btn-back-to-menu">回主選單</button>
     </div>
 
     <div id="game-area" class="hidden">
@@ -20,6 +26,7 @@
             
             <div class="player-zone" id="player1-zone">
                 <h2>玩家 1</h2>
+                <h3 id="p1-goal-display" class="hidden">目標: <span id="p1-goal-lines">0</span> / 100 行</h3>
                 <canvas id="p1-board"></canvas>
                 <h3>分數: <span id="p1-score">0</span></h3>
             </div>
@@ -33,7 +40,8 @@
 
         <div class="controls">
             <button id="btn-pause">P (暫停)</button>
-            <button id="btn-restart-match" class="hidden">重開本局</button> <button id="btn-restart">回主選單</button> 
+            <button id="btn-restart-match">重開本局</button>
+            <button id="btn-restart">回主選單</button> 
         </div>
 
         <div class="instructions hidden" id="instructions-p1">
@@ -44,12 +52,8 @@
         <div class="instructions hidden" id="instructions-p2">
             <h3>遊戲控制</h3>
             <div class="control-split">
-                <div class="player-controls">
-                    <strong>玩家 1 (方向鍵)</strong>
-                </div>
-                <div class="player-controls">
-                    <strong>玩家 2 (W/A/S/D)</strong>
-                </div>
+                <div class="player-controls"><strong>玩家 1 (方向鍵)</strong></div>
+                <div class="player-controls"><strong>玩家 2 (W/A/S/D)</strong></div>
             </div>
             <p><strong>P 鍵:</strong> 暫停 / 繼續</p>
         </div>
