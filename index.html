@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>俄羅斯方塊 (單/雙人/闖關)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>俄羅斯方塊 (全平台版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,15 +22,14 @@
     </div>
 
     <div id="game-area" class="hidden">
+        
         <div class="game-container">
-            
             <div class="player-zone" id="player1-zone">
                 <h2>玩家 1</h2>
                 <h3 id="p1-goal-display" class="hidden">目標: <span id="p1-goal-lines">0</span> / 100 行</h3>
                 <canvas id="p1-board"></canvas>
                 <h3>分數: <span id="p1-score">0</span></h3>
             </div>
-
             <div class="player-zone hidden" id="player2-zone">
                 <h2>玩家 2</h2>
                 <canvas id="p2-board"></canvas>
@@ -58,6 +57,17 @@
             <p><strong>P 鍵:</strong> 暫停 / 繼續</p>
         </div>
 
-    </div> <script src="script.js"></script>
+    </div> <div id="mobile-controls" class="hidden">
+        <div class="dpad-left">
+            <button id="btn-mobile-left">←</button>
+            <button id="btn-mobile-right">→</button>
+        </div>
+        <div class="dpad-right">
+            <button id="btn-mobile-rotate">↑</button>
+            <button id="btn-mobile-down">↓</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
 </body>
 </html>

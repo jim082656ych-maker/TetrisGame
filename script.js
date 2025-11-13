@@ -1,18 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 0. [!新增!] 裝置偵測 ---
+    // --- 0. [! 大修改 !] 裝置偵測 v6.1 ---
     let isMobile = false;
     function detectDevice() {
-        // 一個簡單的偵測 (也可以用 window.innerWidth < 768)
-        isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // [!修改!] 我們不再用 userAgent，我們改用「螢幕寬度」。
+        // 768px 是平板電腦的標準分界線
+        isMobile = (window.innerWidth <= 768); 
+        console.log(`Device check: isMobile = ${isMobile} (Screen width: ${window.innerWidth}px)`);
     }
     detectDevice(); // 馬上偵測
+    // --- (0. 結束) ---
+
 
     // --- 1. 遊戲設定 (Constants) ---
     const ROWS = 20;
     const COLS = 10;
-    // [!修改!] 動態決定方塊大小
-    // 如果是手機，就用 18px (畫布 180px 寬)，否則 20px (畫布 200px 寬)
+    // [!修改!] 這裡的邏輯現在會 100% 正確
     const BLOCK_SIZE = isMobile ? 18 : 20;
     const LEVEL_START_SPEED = 1000;
     const GOAL_LINES = 100;
@@ -37,35 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let fireworksLoopId = null;
 
     // --- 2. 玩家類別 (Player Class) ---
+    // (這整段 v6.0 的 class Player { ... } 程式碼，一個字都不用改，
+    //  我完整貼上，確保你不會出錯)
     class Player {
         constructor(canvasId, scoreId) {
             this.canvas = document.getElementById(canvasId);
             this.context = this.canvas.getContext('2d');
             this.scoreElement = document.getElementById(scoreId);
-            
-            // [!修改!] 畫布大小使用動態 BLOCK_SIZE
             this.canvas.width = COLS * BLOCK_SIZE;
             this.canvas.height = ROWS * BLOCK_SIZE;
-
-            // ... (其他 constructor 屬性不變)
             this.board = this.createEmptyBoard();
             this.playerPiece = null;
             this.score = 0;
             this.totalLinesCleared = 0;
             this.gameSpeed = LEVEL_START_SPEED;
-            this.gameInterval = null;
+            this.gameInterval = null; // 這個在 v6.0 沒用了，但先留著
+            this.lastDropTime = 0; // [!新增!] v6.0 的新計時器
             this.garbageQueue = 0;
             this.opponent = null; 
             this.bag = [];
         }
-        
-        // ... (fillBag, getNextPieceType, createEmptyBoard, spawnNewPiece, gameOver, opponentWon, isValidMove, lockPiece, clearLines, addGarbage, processGarbage, draw, moveLeft, moveRight, rotatePiece, rotate, drop, update, start ... )
-        //
-        // [!] 這 19 個函式，跟 v5.0「完全一樣」，一個字都不用改！
-        // (我們的 class 架構寫得太好了，它不在乎 P1 是用「鍵盤」還是「手機按鈕」呼叫 .moveLeft())
-        // (為節省篇幅，我先不貼，請你保留你 v5.0 的 19 個函式... 
-        //  ...等等，不行，你要求「完整取代」，我必須貼上)
-
         fillBag() {
             const shapes = [...SHAPE_KEYS];
             for (let i = shapes.length - 1; i > 0; i--) {
@@ -91,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         gameOver(didWin = false) {
-            clearInterval(this.gameInterval);
+            clearInterval(this.gameInterval); // 雖然沒用，但保險
             if (globalGameInterval) cancelAnimationFrame(globalGameInterval);
             globalGameInterval = null;
             isPaused = true;
@@ -168,8 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newSpeed = Math.max(100, LEVEL_START_SPEED - (currentLevel * 100));
                 if (newSpeed !== this.gameSpeed) {
                     this.gameSpeed = newSpeed;
-                    clearInterval(this.gameInterval);
-                    this.gameInterval = setInterval(() => this.drop(), this.gameSpeed);
+                    // (v6.0 移除了 setInterval, 所以這裡不用動)
                 }
             }
         }
@@ -213,9 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         moveLeft() {
-            if(isPaused || !this.playerPiece) return; // [!新增] 安全檢查
+            if(isPaused || !this.playerPiece) return;
             let proposedMove = { ...this.playerPiece, x: this.playerPiece.x - 1 };
-            if (this.isValidMove(proposedMove)) { this.playerPiece = proposedMove; this.draw(); } // [!修改] 手機版需要立即重畫
+            if (this.isValidMove(proposedMove)) { this.playerPiece = proposedMove; this.draw(); }
         }
         moveRight() {
             if(isPaused || !this.playerPiece) return;
@@ -231,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const kickedMove = { ...proposedMove, x: proposedMove.x + kick };
                 if (this.isValidMove(kickedMove)) {
                     this.playerPiece = kickedMove;
-                    this.draw(); // [!修改] 手機版需要立即重畫
+                    this.draw();
                     return;
                 }
             }
@@ -253,16 +246,15 @@ document.addEventListener('DOMContentLoaded', () => {
             let futureMove = { ...this.playerPiece, y: this.playerPiece.y + 1 };
             if (this.isValidMove(futureMove)) {
                 this.playerPiece.y++;
-                this.draw(); // [!修改] 立即重畫
+                this.draw();
             } else {
                 this.lockPiece();
                 this.processGarbage();
                 this.spawnNewPiece();
-                this.draw(); // [!修改] 立即重畫
+                this.draw();
             }
         }
         update() { if (!isPaused) { this.draw(); } }
-        
         start() {
             this.board = this.createEmptyBoard();
             this.score = 0;
@@ -275,80 +267,57 @@ document.addEventListener('DOMContentLoaded', () => {
                  p1GoalLines.textContent = `0`;
             }
             this.spawnNewPiece();
-            // [!修改!] 遊戲迴圈 (掉落) 和繪圖 (gameLoop) 分開
-            // 我們只在 gameLoop 裡 draw()，所以 drop() 裡面不需要 draw()
-            // 為了手機版有「按一下、動一下」的即時反饋，我們把 draw() 加回去了。
-            // 我們現在把「自動掉落」也交給 requestAnimationFrame 處理
-            
-            clearInterval(this.gameInterval); // [!刪除!] 不再使用 setInterval
-            
-            // [!修改!] 我們需要在 gameLoop 裡處理自動掉落
-            this.lastDropTime = 0;
+            this.lastDropTime = 0; // [!修改!] 重置掉落計時器
         }
-        
-        // [!新增!] 由 gameLoop 呼叫的自動掉落
         autoDrop(timestamp) {
             if (isPaused) return;
             if (!this.lastDropTime) this.lastDropTime = timestamp;
-            
             const deltaTime = timestamp - this.lastDropTime;
-            
             if (deltaTime > this.gameSpeed) {
                 this.lastDropTime = timestamp;
-                this.drop(); // 呼叫你原有的 drop
+                this.drop();
             }
         }
     }
     // --- 玩家 Class (類別) 結束 ---
 
-
     // --- 3. 遊戲啟動與控制 (含選單邏輯) ---
+    // (DOM 元素取得 v6.0)
     const mainMenu = document.getElementById('main-menu');
     const gameArea = document.getElementById('game-area');
     const gameWonMenu = document.getElementById('game-won');
     const winMessage = document.getElementById('win-message');
-    
     const btnSinglePlayer = document.getElementById('btn-single-player');
     const btnTwoPlayer = document.getElementById('btn-two-player');
     const btnBackToMenu = document.getElementById('btn-back-to-menu');
-    
     const player1Zone = document.getElementById('player1-zone');
     const player2Zone = document.getElementById('player2-zone');
     const p1Instructions = document.getElementById('instructions-p1');
     const p2Instructions = document.getElementById('instructions-p2');
     const p1GoalDisplay = document.getElementById('p1-goal-display');
     const p1GoalLines = document.getElementById('p1-goal-lines');
-    
     const btnPause = document.getElementById('btn-pause');
     const btnRestart = document.getElementById('btn-restart'); 
     const btnRestartMatch = document.getElementById('btn-restart-match'); 
-
-    // [!新增!] 手機按鈕
     const mobileControls = document.getElementById('mobile-controls');
     const btnMobileLeft = document.getElementById('btn-mobile-left');
     const btnMobileRight = document.getElementById('btn-mobile-right');
     const btnMobileRotate = document.getElementById('btn-mobile-rotate');
     const btnMobileDown = document.getElementById('btn-mobile-down');
     
-    
     // [!修改!] 裝置偵測後，更新 UI
     if (isMobile) {
         btnTwoPlayer.classList.add('hidden'); // 手機版隱藏雙人
     }
     
-
-    // [!修改!] 繪圖迴圈 (現在也要負責自動掉落)
+    // (gameLoop, startGame, showMenu, restartGame, showGameWonScreen, togglePause v6.0)
     function gameLoop(timestamp) {
         allPlayers.forEach(player => {
-            player.autoDrop(timestamp); // [!新增!]
-            player.update(); // 繪圖
+            player.autoDrop(timestamp);
+            player.update();
         });
-        
-        if (!isPaused) { 
-            globalGameInterval = requestAnimationFrame(gameLoop); 
-        }
+        if (!isPaused) { globalGameInterval = requestAnimationFrame(gameLoop); }
     }
-    
     function startGame(mode) {
         currentGameMode = mode || currentGameMode; 
         mainMenu.classList.add('hidden');
@@ -356,10 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btnRestartMatch.classList.remove('hidden');
         gameWonMenu.classList.add('hidden');
         
-        // [!新增!] 手機版 UI
         if (isMobile) {
             mobileControls.classList.remove('hidden');
-            // [!新增!] 手機版把遊戲區移到最中間
             player1Zone.style.margin = "0 auto";
         }
         
@@ -376,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
             p1GoalDisplay.classList.remove('hidden');
         } 
         else if (currentGameMode === 'two') {
-            // (手機上不會進入這裡，但電腦版會)
             player2Zone.classList.remove('hidden');
             p1Instructions.classList.add('hidden');
             p2Instructions.classList.remove('hidden');
@@ -393,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (globalGameInterval) cancelAnimationFrame(globalGameInterval);
         globalGameInterval = requestAnimationFrame(gameLoop);
     }
-    
     function showMenu() {
         allPlayers.forEach(player => {
             if (player.gameInterval) { clearInterval(player.gameInterval); }
@@ -409,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameArea.classList.add('hidden');
         gameWonMenu.classList.add('hidden');
         btnRestartMatch.classList.add('hidden');
-        mobileControls.classList.add('hidden'); // [!新增!] 隱藏手機按鈕
+        mobileControls.classList.add('hidden');
         
         currentGameMode = null;
         
@@ -418,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         p1Ctx.fillStyle = 'black'; p1Ctx.fillRect(0, 0, p1Ctx.canvas.width, p1Ctx.canvas.height);
         p2Ctx.fillStyle = 'black'; p2Ctx.fillRect(0, 0, p2Ctx.canvas.width, p2Ctx.canvas.height);
     }
-    
     function restartGame() {
         if (currentGameMode) {
             allPlayers.forEach(player => {
@@ -429,11 +393,10 @@ document.addEventListener('DOMContentLoaded', () => {
             startGame(currentGameMode);
         }
     }
-    
     function showGameWonScreen(winningPlayer) {
         gameArea.classList.add('hidden');
         gameWonMenu.classList.remove('hidden');
-        mobileControls.classList.add('hidden'); // [!新增!] 勝利時隱藏手機按鈕
+        mobileControls.classList.add('hidden');
         
         if (winningPlayer.opponent) {
             const winnerId = winningPlayer.canvas.id.replace('-board', '').toUpperCase();
@@ -443,12 +406,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         startFireworks(winningPlayer.context);
     }
-    
     function togglePause() {
         if (!allPlayers.length || fireworksLoopId) return;
         isPaused = !isPaused;
         if (isPaused) {
-            // (v5.0 的 togglePause 邏輯不變)
             if (globalGameInterval) cancelAnimationFrame(globalGameInterval);
             globalGameInterval = null;
             btnPause.textContent = "繼續";
@@ -461,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 player.context.fillText('PAUSED', player.canvas.width / 2, player.canvas.height / 2);
             });
         } else {
-            // [!修改!] 恢復遊戲時，重置 lastDropTime
             allPlayers.forEach(player => {
                 player.lastDropTime = 0; 
             });
@@ -470,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3.6 鍵盤控制 (v5.0 不變)
+    // 鍵盤控制 (v6.0 不變)
     document.addEventListener('keydown', (event) => {
         if (event.key === 'p' || event.key === 'P') { togglePause(); return; }
         if (isPaused || !allPlayers.length) return; 
@@ -488,30 +448,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3.7 電腦按鈕監聽 (v5.0 不變)
+    // 電腦 + 手機按鈕監聽 (v6.0)
     btnSinglePlayer.addEventListener('click', () => startGame('single'));
     btnTwoPlayer.addEventListener('click', () => startGame('two'));
     btnBackToMenu.addEventListener('click', showMenu);
     btnPause.addEventListener('click', togglePause);
     btnRestart.addEventListener('click', showMenu);
     btnRestartMatch.addEventListener('click', restartGame);
+    btnMobileLeft.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].moveLeft(); });
+    btnMobileRight.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].moveRight(); });
+    btnMobileDown.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].drop(); });
+    btnMobileRotate.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].rotatePiece(); });
+
     
-    // 3.8 [!新增!] 手機按鈕監聽
-    // (我們用 'click' 事件，它在手機上會被 'tap' 觸發)
-    btnMobileLeft.addEventListener('click', () => {
-        if (allPlayers[0]) allPlayers[0].moveLeft();
-    });
-    btnMobileRight.addEventListener('click', () => {
-        if (allPlayers[0]) allPlayers[0].moveRight();
-    });
-    btnMobileDown.addEventListener('click', () => {
-        if (allPlayers[0]) allPlayers[0].drop();
-    });
-    btnMobileRotate.addEventListener('click', () => {
-        if (allPlayers[0]) allPlayers[0].rotatePiece();
-    });
-
-
     // --- 4. 煙火特效 (v5.0 不變) ---
     // (這整段 4.x 函式和 class 都不變)
     let fireworks = [];
@@ -521,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fireworks = []; 
         if(globalGameInterval) cancelAnimationFrame(globalGameInterval);
         globalGameInterval = null;
-        allPlayers.forEach(p => clearInterval(p.gameInterval));
+        allPlayers.forEach(p => clearInterval(p.gameInterval)); // 確保舊 setInterval 也停了
         for (let i = 0; i < 5; i++) {
             fireworks.push(new Firework(
                 Math.random() * (COLS * BLOCK_SIZE), ROWS * BLOCK_SIZE, 
@@ -538,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
              fireworksLoopId = null; return;
         }
         fireworksContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        fireworksContext.fillRect(0, 0, fireworksContext.canvas.width, fireworksContext.canvas.height); // [!修正!] 用 context.canvas.width
+        fireworksContext.fillRect(0, 0, fireworksContext.canvas.width, fireworksContext.canvas.height);
         for (let i = fireworks.length - 1; i >= 0; i--) {
             fireworks[i].update();
             fireworks[i].draw(fireworksContext);
