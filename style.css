@@ -21,22 +21,9 @@ body {
 .menu-container button:hover { background-color: #e67e22; color: white; }
 #p1-goal-display { color: #00FFFF; margin: 0 0 10px 0; font-size: 1.1em; }
 
-/* [!新增!] 排行榜樣式 */
-#leaderboard-list {
-    list-style-type: decimal; /* 1. 2. 3. */
-    padding-left: 40px;
-    text-align: left;
-    font-size: 1.2em;
-    color: #ecf0f1;
-}
-#leaderboard-list li {
-    margin-bottom: 10px;
-}
-#leaderboard-list li strong {
-    color: #f1c40f; /* 名字用黃色 */
-}
+/* [!刪除!] 排行榜樣式 (已移除) */
 
-/* --- 遊戲区域 (不變) --- */
+/* --- 遊戲區域 (不變) --- */
 .game-container { display: flex; justify-content: center; align-items: flex-start; gap: 30px; margin-top: 10px; }
 .player-zone { background-color: #34495e; padding: 15px; border-radius: 10px; }
 canvas { background-color: #000; border: 5px solid #7f8c8d; }

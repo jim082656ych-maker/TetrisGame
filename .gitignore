@@ -1,9 +1,0 @@
-# 忽略所有 Node.js 的安裝套件
-node_modules
-
-# 忽略 npm 的偵錯日誌
-npm-debug.log
-
-# 忽略我們的「資料庫」檔案 (資料庫應該留在本地，不該上傳)
-scores.db
-

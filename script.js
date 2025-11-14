@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // [!修改!] 遊戲結束函式
+        // [!修改!] 遊戲結束函式 (已移除 API 呼叫)
         gameOver(didWin = false) {
             if (globalGameInterval) cancelAnimationFrame(globalGameInterval);
             globalGameInterval = null;
@@ -83,9 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (this.opponent) {
                 this.opponent.opponentWon(); 
             } else {
-                // [!修改!] 單人模式輸了，也嘗試儲存分數
+                // [!修改!] 回歸 v6.1 的 alert
                 alert(`遊戲結束! 你的分數: ${this.score}`);
-                promptAndSaveScore(this.score); // [!新增!]
             }
         }
         
@@ -127,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         clearLines() {
+            // (clearLines 邏輯不變)
             let linesCleared = 0;
             for (let y = ROWS - 1; y >= 0; y--) {
                 if (this.board[y].every(cell => cell !== 0 && cell !== GREY_COLOR)) { 
@@ -136,12 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     y++; 
                 }
             }
-            
             if (linesCleared > 0) {
                 this.score += linesCleared * 10 * linesCleared;
                 this.scoreElement.textContent = this.score;
                 this.totalLinesCleared += linesCleared;
-                
                 if (currentGameMode === 'single') {
                     p1GoalLines.textContent = `${this.totalLinesCleared}`;
                     if (this.totalLinesCleared >= GOAL_LINES) {
@@ -153,10 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     let garbageToSend = linesCleared > 1 ? linesCleared - 1 : 0;
                     if (garbageToSend > 0) { this.opponent.addGarbage(garbageToSend); }
                 }
-                
                 const currentLevel = Math.floor(this.totalLinesCleared / 10);
                 const newSpeed = Math.max(100, LEVEL_START_SPEED - (currentLevel * 100));
-                
                 if (newSpeed !== this.gameSpeed) {
                     this.gameSpeed = newSpeed;
                 }
@@ -287,14 +283,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameArea = document.getElementById('game-area');
     const gameWonMenu = document.getElementById('game-won');
     const winMessage = document.getElementById('win-message');
-    const leaderboardScreen = document.getElementById('leaderboard-screen'); // [!新增]
-    const leaderboardList = document.getElementById('leaderboard-list'); // [!新增]
+    // [!刪除!] 排行榜 DOM
     
     const btnSinglePlayer = document.getElementById('btn-single-player');
     const btnTwoPlayer = document.getElementById('btn-two-player');
-    const btnLeaderboard = document.getElementById('btn-leaderboard'); // [!新增]
     const btnBackToMenu = document.getElementById('btn-back-to-menu');
-    const btnBackToMenuFromLb = document.getElementById('btn-back-to-menu-from-lb'); // [!新增]
+    // [!刪除!] 排行榜按鈕
     
     // ... (其他 DOM 元素取得不變)
     const player1Zone = document.getElementById('player1-zone');
@@ -328,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameArea.classList.remove('hidden');
         btnRestartMatch.classList.remove('hidden');
         gameWonMenu.classList.add('hidden');
-        leaderboardScreen.classList.add('hidden'); // [!新增]
+        // [!刪除!] leaderboardScreen.classList.add('hidden');
         
         if (isMobile) {
             mobileControls.classList.remove('hidden');
@@ -372,10 +366,10 @@ document.addEventListener('DOMContentLoaded', () => {
         fireworksLoopId = null;
         allPlayers = [];
         
-        mainMenu.classList.remove('hidden'); // [!修改!] 顯示主選單
+        mainMenu.classList.remove('hidden');
         gameArea.classList.add('hidden');
         gameWonMenu.classList.add('hidden');
-        leaderboardScreen.classList.add('hidden'); // [!新增!]
+        // [!刪除!] leaderboardScreen.classList.add('hidden');
         btnRestartMatch.classList.add('hidden');
         mobileControls.classList.add('hidden');
         currentGameMode = null;
@@ -386,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p2Ctx.fillStyle = 'black'; p2Ctx.fillRect(0, 0, p2Ctx.canvas.width, p2Ctx.canvas.height);
     }
     
-    // (restartGame 不變)
+    // (restartGame, showGameWonScreen, togglePause, 鍵盤控制... 不變)
     function restartGame() {
         if (currentGameMode) {
             allPlayers.forEach(player => {
@@ -397,29 +391,20 @@ document.addEventListener('DOMContentLoaded', () => {
             startGame(currentGameMode);
         }
     }
-    
-    // [!修改!] 全破畫面
     function showGameWonScreen(winningPlayer) {
         gameArea.classList.add('hidden');
         gameWonMenu.classList.remove('hidden');
         mobileControls.classList.add('hidden');
         
-        let winnerName = "玩家 1"; // 預設
-        
         if (winningPlayer.opponent) {
-            winnerName = winningPlayer.canvas.id.includes('p1') ? "玩家 1" : "玩家 2";
-            winMessage.textContent = `${winnerName} 獲勝！`;
+            const winnerId = winningPlayer.canvas.id.replace('-board', '').toUpperCase();
+            winMessage.textContent = `${winnerId} 獲勝！`;
         } else {
             winMessage.textContent = '你完成了 100 行挑戰！';
         }
-        
-        // [!新增!] 勝利時，儲存分數
-        promptAndSaveScore(winningPlayer.score, winnerName);
-        
+        // [!刪除!] promptAndSaveScore(...)
         startFireworks(winningPlayer.context);
     }
-    
-    // (togglePause, 鍵盤控制... 不變)
     function togglePause() {
         if (!allPlayers.length || fireworksLoopId) return;
         isPaused = !isPaused;
@@ -460,11 +445,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- [!大修改!] 3.7 按鈕監聽 (加入 API) ---
+    // 3.7 [!修改!] 按鈕監聽 (移除 API)
     btnSinglePlayer.addEventListener('click', () => startGame('single'));
     btnTwoPlayer.addEventListener('click', () => startGame('two'));
     btnBackToMenu.addEventListener('click', showMenu);
-    btnBackToMenuFromLb.addEventListener('click', showMenu); // [!新增!]
     btnPause.addEventListener('click', togglePause);
     btnRestart.addEventListener('click', showMenu);
     btnRestartMatch.addEventListener('click', restartGame);
@@ -473,76 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnMobileDown.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].drop(); });
     btnMobileRotate.addEventListener('click', () => { if (allPlayers[0]) allPlayers[0].rotatePiece(); });
     
-    // [!新增!] 排行榜按鈕
-    btnLeaderboard.addEventListener('click', () => {
-        showLeaderboard();
-    });
-    
-    // --- [!新增!] 4. API 溝通函式 ---
-    
-    // [!新增!] 詢問並儲存分數
-    async function promptAndSaveScore(score, defaultName = "玩家") {
-        if (score === 0) return; // 0 分不儲存
-        
-        const name = prompt(`恭喜！你的分數是: ${score}\n請輸入你的名字來儲存紀錄：`, defaultName);
-        
-        if (name) {
-            try {
-                const response = await fetch('/api/scores', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name: name, score: score }),
-                });
-                
-                if (response.ok) {
-                    console.log("分數上傳成功！");
-                    // 上傳成功後，自動顯示排行榜
-                    showLeaderboard();
-                } else {
-                    console.error("分數上傳失敗");
-                }
-            } catch (err) {
-                console.error("連線到伺服器失敗:", err);
-            }
-        }
-    }
-    
-    // [!新增!] 顯示排行榜
-    async function showLeaderboard() {
-        // 隱藏所有其他畫面
-        mainMenu.classList.add('hidden');
-        gameArea.classList.add('hidden');
-        gameWonMenu.classList.add('hidden');
-        // 顯示排行榜
-        leaderboardScreen.classList.remove('hidden');
-        
-        leaderboardList.innerHTML = "<li>載入中...</li>"; // 顯示載入中
-        
-        try {
-            const response = await fetch('/api/scores'); // 呼叫 GET API
-            const result = await response.json();
-            
-            if (response.ok && result.data) {
-                leaderboardList.innerHTML = ""; // 清空
-                if (result.data.length === 0) {
-                    leaderboardList.innerHTML = "<li>目前沒有紀錄</li>";
-                } else {
-                    result.data.forEach(entry => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<strong>${entry.name}</strong>: ${entry.score} 分`;
-                        leaderboardList.appendChild(li);
-                    });
-                }
-            } else {
-                leaderboardList.innerHTML = "<li>載入失敗</li>";
-            }
-        } catch (err) {
-            console.error("無法讀取排行榜:", err);
-            leaderboardList.innerHTML = "<li>無法連線到伺服器</li>";
-        }
-    }
+    // [!刪除!] 4. API 溝通函式 (已移除)
     
     // --- 5. 煙火特效 (v5.0 不變) ---
     // (這整段 5.x 函式和 class 都不變)
