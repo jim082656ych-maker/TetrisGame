@@ -1,143 +1,87 @@
-/* --- 基礎設定 --- */
-* {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
+/* --- 基礎設定 (不變) --- */
+* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 body {
-    background-color: #2c3e50;
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 10px 0 100px 0;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
+    background-color: #2c3e50; color: white; font-family: Arial, sans-serif;
+    text-align: center; padding: 10px 0 100px 0; overflow: hidden;
+    position: fixed; width: 100%; height: 100%;
 }
 .hidden { display: none !important; }
 
-/* --- 選單 --- */
+/* --- 選單 (不變) --- */
 .menu-container {
-    background-color: #34495e;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 600px;
-    margin: 15px auto;
+    background-color: #34495e; padding: 20px; border-radius: 10px;
+    max-width: 600px; margin: 15px auto;
 }
 .menu-container h2 { margin: 0 0 20px 0; }
 .menu-container button {
-    font-size: 1.1em;
-    padding: 15px;
-    width: 80%;
-    margin: 10px auto;
-    background-color: #f1c40f; 
-    color: #333;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    font-size: 1.1em; padding: 15px; width: 80%; margin: 10px auto;
+    background-color: #f1c40f; color: #333; border: none;
+    border-radius: 5px; cursor: pointer;
 }
-.menu-container button:hover {
-    background-color: #e67e22; 
-    color: white;
-}
+.menu-container button:hover { background-color: #e67e22; color: white; }
 #p1-goal-display { color: #00FFFF; margin: 0 0 10px 0; font-size: 1.1em; }
 
-/* --- 遊戲區域 --- */
-.game-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 30px;
-    margin-top: 10px;
+/* [!新增!] 排行榜樣式 */
+#leaderboard-list {
+    list-style-type: decimal; /* 1. 2. 3. */
+    padding-left: 40px;
+    text-align: left;
+    font-size: 1.2em;
+    color: #ecf0f1;
 }
-.player-zone {
-    background-color: #34495e;
-    padding: 15px;
-    border-radius: 10px;
+#leaderboard-list li {
+    margin-bottom: 10px;
 }
-canvas {
-    background-color: #000;
-    border: 5px solid #7f8c8d;
+#leaderboard-list li strong {
+    color: #f1c40f; /* 名字用黃色 */
 }
+
+/* --- 遊戲区域 (不變) --- */
+.game-container { display: flex; justify-content: center; align-items: flex-start; gap: 30px; margin-top: 10px; }
+.player-zone { background-color: #34495e; padding: 15px; border-radius: 10px; }
+canvas { background-color: #000; border: 5px solid #7f8c8d; }
 h2 { font-size: 1.2em; margin-bottom: 10px; }
 h3 { font-size: 1.1em; margin-top: 10px; }
 #p1-score, #p2-score { color: #FFFF00; }
 
-/* --- 控制按鈕 --- */
+/* --- 控制按鈕 (不變) --- */
 .controls { margin-top: 15px; }
 button {
-    font-size: 14px;
-    width: 120px;
-    height: 35px;
-    margin: 0 5px;
-    background-color: #c0392b; /* 紅色 */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    font-size: 14px; width: 120px; height: 35px; margin: 0 5px;
+    background-color: #c0392b; color: white; border: none;
+    border-radius: 5px; cursor: pointer;
 }
 button:active { background-color: #e74c3c; }
 
-/* --- 說明 --- */
+/* --- 說明 (不變) --- */
 .instructions {
-    margin: 15px auto 0 auto;
-    padding: 10px;
-    border: 2px solid #7f8c8d;
-    border-radius: 10px;
-    max-width: 600px;
-    background-color: #34495e;
+    margin: 15px auto 0 auto; padding: 10px; border: 2px solid #7f8c8d;
+    border-radius: 10px; max-width: 600px; background-color: #34495e;
 }
-/* ... (說明欄位 h3, .control-split... 不變) ... */
 .instructions h3 { margin-top: 0; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; }
 .control-split { display: flex; justify-content: space-around; text-align: left; margin-bottom: 15px; }
 .player-controls { line-height: 1.6; }
 .instructions p { font-weight: bold; }
 
-
-/* --- 勝利畫面 --- */
-#congrats-text {
-    font-size: 2.5em;
-    font-weight: bold;
-    animation: rainbow-text 3s infinite linear;
-}
-#win-message {
-    font-size: 1.5em;
-    color: #f1c40f;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
+/* --- 勝利畫面 (不變) --- */
+#congrats-text { font-size: 2.5em; font-weight: bold; animation: rainbow-text 3s infinite linear; }
+#win-message { font-size: 1.5em; color: #f1c40f; margin-top: 10px; margin-bottom: 20px; }
 @keyframes rainbow-text {
     0%    { color: #ff0000; } 15%   { color: #ff7f00; } 30%   { color: #ffff00; }
     45%   { color: #00ff00; } 60%   { color: #0000ff; } 75%   { color: #4b0082; }
     90%   { color: #9400d3; } 100%  { color: #ff0000; }
 }
 
-/* --- 手機虛擬按鈕 --- */
+/* --- 手機按鈕 (不變) --- */
 #mobile-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 20px;
-    box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.2);
+    display: flex; justify-content: space-between; align-items: center;
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    padding: 10px 20px; box-sizing: border-box; background: rgba(0, 0, 0, 0.2);
 }
 .dpad-left, .dpad-right { display: flex; gap: 15px; }
 #mobile-controls button {
-    font-size: 24px;
-    font-weight: bold;
-    width: 70px; 
-    height: 70px;
-    margin: 0;
-    border-radius: 50%;
-    background-color: #555;
-    color: white;
-    border: 2px solid #888;
-    opacity: 0.8;
+    font-size: 24px; font-weight: bold; width: 70px; height: 70px; margin: 0;
+    border-radius: 50%; background-color: #555; color: white;
+    border: 2px solid #888; opacity: 0.8;
 }
 #mobile-controls button:active { background-color: #777; }

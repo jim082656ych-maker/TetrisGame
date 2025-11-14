@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>俄羅斯方塊 (全平台版)</title>
+    <title>俄羅斯方塊 (全端版)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,16 +13,22 @@
         <h2>選擇模式</h2>
         <button id="btn-single-player">單人闖關 (目標: 100行)</button>
         <button id="btn-two-player">雙人對戰 (P1 vs P2)</button>
-    </div>
+        <button id="btn-leaderboard">全球排行榜</button> </div>
 
     <div id="game-won" class="menu-container hidden">
         <h2 id="congrats-text">CONGRATULATIONS</h2> 
         <p id="win-message">你完成了 100 行挑戰！</p> 
         <button id="btn-back-to-menu">回主選單</button>
     </div>
+    
+    <div id="leaderboard-screen" class="menu-container hidden">
+        <h2>全球排行榜</h2>
+        <ol id="leaderboard-list">
+            </ol>
+        <button id="btn-back-to-menu-from-lb">回主選單</button>
+    </div>
 
     <div id="game-area" class="hidden">
-        
         <div class="game-container">
             <div class="player-zone" id="player1-zone">
                 <h2>玩家 1</h2>
@@ -36,18 +42,15 @@
                 <h3>分數: <span id="p2-score">0</span></h3>
             </div>
         </div>
-
         <div class="controls">
             <button id="btn-pause">P (暫停)</button>
             <button id="btn-restart-match">重開本局</button>
             <button id="btn-restart">回主選單</button> 
         </div>
-
         <div class="instructions hidden" id="instructions-p1">
             <h3>遊戲控制 (P1)</h3>
             <p>↑ (上): 旋轉 | ← (左): 向左 | ↓ (下): 加速 | → (右): 向右 | P: 暫停</p>
         </div>
-        
         <div class="instructions hidden" id="instructions-p2">
             <h3>遊戲控制</h3>
             <div class="control-split">
@@ -56,8 +59,9 @@
             </div>
             <p><strong>P 鍵:</strong> 暫停 / 繼續</p>
         </div>
+    </div> 
 
-    </div> <div id="mobile-controls" class="hidden">
+    <div id="mobile-controls" class="hidden">
         <div class="dpad-left">
             <button id="btn-mobile-left">←</button>
             <button id="btn-mobile-right">→</button>
